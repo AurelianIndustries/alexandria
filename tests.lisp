@@ -17,9 +17,9 @@
 ;;;; Arrays
 
 (deftest copy-array.1
-    (let* ((orig (vector 1 2 3))
-           (copy (copy-array orig)))
-      (values (eq orig copy) (equalp orig copy)))
+  (let* ((orig (vector 1 2 3))
+         (copy (copy-array orig)))
+    (values (eq orig copy) (equalp orig copy)))
   nil t)
 
 (deftest copy-array.2
@@ -215,13 +215,36 @@
   t)
 
 (deftest define-constant.2
-    (let ((name (gensym)))
-      (eval `(define-constant ,name 13))
-      (eval `(define-constant ,name 13))
-      (values (eql 13 (symbol-value name))
-              (constantp name)))
+  (let ((name (gensym)))
+    (eval `(define-constant ,name 13))
+    (eval `(define-constant ,name 13))
+    (values (eql 13 (symbol-value name))
+            (constantp name)))
   t
   t)
+
+(deftest define-constant.3
+  (let ((name (gensym)))
+    (eval `(define-constant ,name 3 :type single-float))
+    (eql 'single-float (eval `(type-of ,name))))
+  nil)
+(deftest define-constant.3
+  (let ((name (gensym)))
+    (eval `(define-constant ,name 3.0 :type single-float :documentation "hi."))
+    (eql 'single-float (eval `(type-of ,name))))
+  t)
+
+(deftest defcustom
+  (let ((name (gensym)))
+    (eval `(defcustom ,name single-float 4 "Testing custom typing."))
+    (eql 'single-float (eval `(type-of ,name))))
+  nil)
+(deftest defcustom
+  (let ((name (gensym)))
+    (eval `(defcustom ,name single-float 4.0 "testing custom type"))
+    (eql 'single-float (eval `(type-of ,name))))
+  t)
+
 
 ;;;; Errors
 

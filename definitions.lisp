@@ -23,15 +23,31 @@
                     :report "Try to redefine the constant."
                     new)))))))
 
-(defmacro define-constant (name initial-value &key (test ''eql) documentation)
+
+
+(defmacro define-constant (name initial-value &key (type t) (test ''eql) documentation)
   "Ensures that the global variable named by NAME is a constant with a value
 that is equal under TEST to the result of evaluating INITIAL-VALUE. TEST is a
 /function designator/ that defaults to EQL. If DOCUMENTATION is given, it
-becomes the documentation string of the constant.
+becomes the documentation string of the constant. The type may be specified with
+TYPE.
 
 Signals an error if NAME is already a bound non-constant variable.
 
 Signals an error if NAME is already a constant variable whose value is not
 equal under TEST to result of evaluating INITIAL-VALUE."
-  `(defconstant ,name (%reevaluate-constant ',name ,initial-value ,test)
-     ,@(when documentation `(,documentation))))
+  `(progn ,(if type `(declaim (type ,type ,name)))
+          (defconstant ,name (%reevaluate-constant ',name (the ,type ,initial-value)
+                                                   ,test)
+            ,@(when documentation `(,documentation)))))
+
+(defmacro definline (name lambda-list &body body)
+  "Declare an inline defun, saves a line of code."
+  `(progn (declaim (inline ,name))
+          (defun ,name ,lambda-list ,@body)))
+
+(defmacro defcustom (name type initial-value documentation)
+  "Define a typed global variable of TYPE with INITIAL-VAUE and docstring
+DOCUMENTATION."
+  `(progn (declaim (type ,type ,name))
+          (defvar ,name (the ,type ,initial-value) ,documentation)))
