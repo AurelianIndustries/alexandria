@@ -55,6 +55,23 @@
     (typep 0 'array-index)
   t)
 
+(deftest list-to-array.1
+    (let ((l '(("This" "is")
+               ("some" "data"))))
+      (alexandria::list-to-array l))
+  #2A(("This" "is") ("some" "data")))
+
+(deftest list-to-array.2
+    (let ((l '(("This" "is")
+               ("some" "ragged" "data"))))
+      (alexandria::list-to-array l))
+  #2A(("This" "is" nil) ("some" "ragged" "data")))
+
+(deftest list-to-array.3
+    (let ((l '(("This"))))
+      (alexandria::list-to-array l))
+  #2A(("This")))
+
 ;;;; Conditions
 
 (deftest unwind-protect-case.1
