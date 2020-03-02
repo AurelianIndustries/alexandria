@@ -79,6 +79,20 @@
   #2A(("This" "is")
       ("missing" "something")))
 
+(deftest lists-to-2d-array.5
+    (let ((l '((1 2)
+               (3 4))))
+      (lists-to-2d-array l :element-type 'fixnum))
+  #2A((1 2)
+      (3 4)))
+
+(deftest lists-to-2d-array.6
+    (let ((l '((1.0 2.0)
+               (3.0 4.0))))
+      (lists-to-2d-array l :element-type 'single-float))
+  #2A((1.0 2.0)
+      (3.0 4.0)))
+
 ;;;; Conditions
 
 (deftest unwind-protect-case.1
