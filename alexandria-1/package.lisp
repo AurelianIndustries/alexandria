@@ -101,7 +101,7 @@
    #:array-index
    #:array-length
    #:copy-array
-   #:list-to-array
+   #:lists-to-2d-array
    ;; Sequences
    #:copy-sequence
    #:deletef
