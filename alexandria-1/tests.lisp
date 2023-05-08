@@ -1780,6 +1780,8 @@
   t
   t)
 
+;;; FIXME: Expected failure on ABCL.
+#-abcl
 (deftest type=.2
     (multiple-value-bind (= ok)
         (type= 'list '(or null cons))
@@ -1787,9 +1789,9 @@
           (and (not =) (not ok))))
   t)
 
-;;; FIXME: Expected failure
-;;; Patched in new release [2023/05/08:rpg]
-#-(and allegro (not (version>= 11)))
+;;; FIXME: Expected failure on ABCL and on Allegro
+;;; Patched in new Allegro release [2023/05/08:rpg]
+#- (or abcl (and allegro (not (version>= 11))))
 (deftest type=.3
     (multiple-value-bind (= ok)
         (type= 'null '(and symbol list))
