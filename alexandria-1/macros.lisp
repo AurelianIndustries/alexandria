@@ -122,7 +122,7 @@ Example:
                          names-and-forms gensyms)
              ,@forms)))))
 
-(defun parse-body (body &key documentation whole)
+(defun parse-body (body &key documentation whole (if-duplicate-doc-string :error))
   "Parses BODY into (values remaining-forms declarations doc-string).
 Documentation strings are recognized only if DOCUMENTATION is true.
 Syntax errors in body are signalled and WHOLE is used in the signal
@@ -135,12 +135,27 @@ arguments when given."
        (setf current (car body))
        (when (and documentation (stringp current) (cdr body))
          (if doc
-             (error "Too many documentation strings in ~S." (or whole body))
+             (ecase if-duplicate-doc-string
+               (:error (error "Too many documentation strings in ~S." (or whole body)))
+               (:cerror (restart-case (error "Too many documentation strings in ~S." (or whole body))
+                          (:return ()
+                           :report "Treat it as the first form and return early from PARSE-BODY."
+                            (go :end))
+                          (:ignore ()
+                           :report "Ignore and continue the parsing."
+                            (pop body))
+                          (:overwrite ()
+                           :report "Set the doc string and continue the parsing."
+                            (setf doc (pop body)))))
+               (:return (go :end))
+               (:ignore (pop body))
+               (:overwrite (setf doc (pop body))))
              (setf doc (pop body)))
          (go :declarations))
        (when (and (listp current) (eql (first current) 'declare))
          (push (pop body) decls)
-         (go :declarations)))
+         (go :declarations))
+       :end)
     (values body (nreverse decls) doc)))
 
 (defun parse-ordinary-lambda-list (lambda-list &key (normalize t)
