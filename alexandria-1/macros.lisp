@@ -125,8 +125,18 @@ Example:
 (defun parse-body (body &key documentation whole (if-duplicate-doc-string :error))
   "Parses BODY into (values remaining-forms declarations doc-string).
 Documentation strings are recognized only if DOCUMENTATION is true.
-Syntax errors in body are signalled and WHOLE is used in the signal
-arguments when given."
+
+Syntax errors in body (duplicate doc strings, see ANSI 3.4.11) are
+signalled by default and WHOLE is used in the signal arguments when
+given.
+
+This behavior can be configured by passing IF-DUPLICATE-DOC-STRING argument.
+Defined keywords:
+  :ERROR - signals an error
+  :CERROR - signals a continuable error, defines restarts RETURN, IGNORE, or OVERWRITE
+  :RETURN - treats the string as the form and returns early
+  :IGNORE - ignores the string and continues parsing
+  :OVERWRITE - sets the documentation string and continues parsing"
   (let ((doc nil)
         (decls nil)
         (current nil))
