@@ -1804,6 +1804,16 @@
   nil
   t)
 
+(defun type=.6.stringp (thing)
+  (not (not (stringp thing))))
+
+(deftest type=.6
+    (multiple-value-bind (= ok)
+        (type= '(or string (satisfies type=.6.stringp)) 'string)
+      (or (and = ok)
+          (and (not =) (not ok))))
+  t)
+
 (macrolet
     ((test (type numbers)
        `(deftest ,(format-symbol t '#:cdr5.~a (string type))
