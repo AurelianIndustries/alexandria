@@ -134,6 +134,16 @@
       (t :yay))
   :yay)
 
+(deftest switch.3
+    (let ((warning? nil))
+      (handler-bind ((warning (lambda (e)
+                                (declare (ignore e))
+                                (setf warning? t))))
+        (values (funcall (compile nil '(lambda () (switch (t)))))
+                warning?)))
+  nil
+  nil)
+
 (deftest eswitch.1
     (let ((x 13))
       (eswitch (x :test =)
