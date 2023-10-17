@@ -1781,14 +1781,18 @@
   t)
 
 (deftest type=.2
-    (type= 'list '(or null cons))
-  t
+    (multiple-value-bind (= ok)
+        (type= 'list '(or null cons))
+      (or (and = ok)
+          (and (not =) (not ok))))
   t)
 
 #-allegro
 (deftest type=.3
-    (type= 'null '(and symbol list))
-  t
+    (multiple-value-bind (= ok)
+        (type= 'null '(and symbol list))
+      (or (and = ok)
+          (and (not =) (not ok))))
   t)
 
 (deftest type=.4
