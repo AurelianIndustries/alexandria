@@ -17,6 +17,7 @@ like #'eq and 'eq."
       (setf default `(,@default "No keys match in SWITCH. Testing against ~S with ~S."
                       ,value ',test)))
     `(let ((,value (,key ,object)))
+      (declare (ignorable ,value))
       (cond ,@(mapcar (lambda (clause)
                         (if (member (first clause) '(t otherwise))
                             (progn
