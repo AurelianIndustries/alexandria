@@ -17,9 +17,9 @@
 ;;;; Arrays
 
 (deftest copy-array.1
-    (let* ((orig (vector 1 2 3))
-           (copy (copy-array orig)))
-      (values (eq orig copy) (equalp orig copy)))
+  (let* ((orig (vector 1 2 3))
+         (copy (copy-array orig)))
+    (values (eq orig copy) (equalp orig copy)))
   nil t)
 
 (deftest copy-array.2
@@ -224,13 +224,39 @@
   t)
 
 (deftest define-constant.2
-    (let ((name (gensym)))
-      (eval `(define-constant ,name 13))
-      (eval `(define-constant ,name 13))
-      (values (eql 13 (symbol-value name))
-              (constantp name)))
+  (let ((name (gensym)))
+    (eval `(define-constant ,name 13))
+    (eval `(define-constant ,name 13))
+    (values (eql 13 (symbol-value name))
+            (constantp name)))
   t
   t)
+
+(deftest define-constant.3
+  (let ((name (gensym)))
+    (eval `(and (ignore-errors (define-constant ,name 3 :type single-float)) t))
+    (eval `(boundp ',name)))
+  nil)
+(deftest define-constant.4
+  (let ((name (gensym)))
+    (eval `(define-constant ,name 3.0 :type single-float :documentation "hi."))
+    (eql 'single-float (eval `(type-of ,name))))
+  t)
+(deftest defcustom.1
+  (let ((name (gensym)))
+    (eval `(alexandria::defcustom ,name integer 4 "Testing custom typing."))
+    (eval `(eql 4 ,name)))
+  t)
+(deftest defcustom.2
+  (let ((name (gensym)))
+    (eval `(alexandria::defcustom ,name single-float 4.0 "testing custom type"))
+    (eql 'single-float (eval `(type-of ,name))))
+  t)
+(deftest defcustom.3
+  (let ((name (gensym)))
+    (and (ignore-errors (eval `(alexandria::defcustom ,name integer 1))) t))
+  nil)
+
 
 ;;;; Errors
 
@@ -241,9 +267,9 @@
   (not (null (typep x 'error))))
 
 (deftest required-argument.1
-    (multiple-value-bind (res err)
-        (ignore-errors (required-argument))
-      (errorp err))
+  (multiple-value-bind (res err)
+      (ignore-errors (required-argument))
+    (errorp err))
   t)
 
 ;;;; Hash tables
