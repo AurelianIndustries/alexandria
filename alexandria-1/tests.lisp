@@ -1706,6 +1706,63 @@
       (errorp err))
   t)
 
+(deftest parse-body.7
+    (parse-body '("foo" "bar" "quux")
+                :documentation t
+                :if-duplicate-doc-string :return)
+  ("bar" "quux")
+  nil
+  "foo")
+
+(deftest parse-body.8
+    (parse-body '("foo" "bar" "quux")
+                :documentation t
+                :if-duplicate-doc-string :ignore)
+  ("quux")
+  nil
+  "foo")
+
+(deftest parse-body.9
+    (parse-body '("foo" "bar" "quux")
+                :documentation t
+                :if-duplicate-doc-string :overwrite)
+  ("quux")
+  nil
+  "bar")
+
+(deftest parse-body.10
+    (handler-bind ((error (lambda (error)
+                            (declare (ignore error))
+                            (invoke-restart :return))))
+      (parse-body '("foo" "bar" "quux")
+                  :documentation t
+                  :if-duplicate-doc-string :cerror))
+  ("bar" "quux")
+  nil
+  "foo")
+
+(deftest parse-body.11
+    (handler-bind ((error (lambda (error)
+                            (declare (ignore error))
+                            (invoke-restart :ignore))))
+      (parse-body '("foo" "bar" "quux")
+                  :documentation t
+                  :if-duplicate-doc-string :cerror))
+  ("quux")
+  nil
+  "foo")
+
+(deftest parse-body.12
+    (handler-bind ((error (lambda (error)
+                            (declare (ignore error))
+                            (invoke-restart :overwrite))))
+      (parse-body '("foo" "bar" "quux")
+                  :documentation t
+                  :if-duplicate-doc-string :cerror))
+  ("quux")
+  nil
+  "bar")
+
 ;;;; Symbols
 
 (deftest ensure-symbol.1
