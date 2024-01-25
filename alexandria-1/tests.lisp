@@ -1781,14 +1781,18 @@
   t)
 
 (deftest type=.2
-    (type= 'list '(or null cons))
-  t
+    (multiple-value-bind (= ok)
+        (type= 'list '(or null cons))
+      (or (and = ok)
+          (and (not =) (not ok))))
   t)
 
 #-allegro
 (deftest type=.3
-    (type= 'null '(and symbol list))
-  t
+    (multiple-value-bind (= ok)
+        (type= 'null '(and symbol list))
+      (or (and = ok)
+          (and (not =) (not ok))))
   t)
 
 (deftest type=.4
@@ -1798,6 +1802,16 @@
 (deftest type=.5
     (type= 'string 'list)
   nil
+  t)
+
+(defun type=.6.stringp (thing)
+  (not (not (stringp thing))))
+
+(deftest type=.6
+    (multiple-value-bind (= ok)
+        (type= '(or string (satisfies type=.6.stringp)) 'string)
+      (or (and = ok)
+          (and (not =) (not ok))))
   t)
 
 (macrolet
