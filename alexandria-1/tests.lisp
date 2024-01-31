@@ -536,6 +536,8 @@
       (funcall curried 7))
   42)
 
+;;; FIXME: Expected failure on CMUCL
+#-cmucl
 (deftest curry.3
     (let ((curried-form (funcall (compiler-macro-function 'curry)
                                  '(curry '/ 8)
@@ -543,8 +545,6 @@
       (let ((fun (funcall (compile nil `(lambda () ,curried-form)))))
         (funcall fun 2)))
   4)
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (pushnew 'curry.3 *expected-failures*))
 
 (deftest curry.4
     (let* ((x 1)
@@ -1787,7 +1787,9 @@
           (and (not =) (not ok))))
   t)
 
-#-allegro
+;;; FIXME: Expected failure
+;;; Patched in new release [2023/05/08:rpg]
+#-(and allegro (not (version>= 11)))
 (deftest type=.3
     (multiple-value-bind (= ok)
         (type= 'null '(and symbol list))
